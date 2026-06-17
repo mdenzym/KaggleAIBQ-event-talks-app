@@ -30,6 +30,7 @@ const themeToggleBtn = document.getElementById("theme-toggle-btn");
 const themePresetsContainer = document.getElementById("theme-presets");
 const moonIcon = themeToggleBtn.querySelector(".moon-icon");
 const sunIcon = themeToggleBtn.querySelector(".sun-icon");
+const exportCsvBtn = document.getElementById("export-csv-btn");
 
 // Statistics Elements
 const statTotalNotes = document.getElementById("stat-total-notes");
@@ -76,6 +77,11 @@ function setupEventListeners() {
             applyPreset(presetName);
         });
     });
+
+    // Export Action
+    if (exportCsvBtn) {
+        exportCsvBtn.addEventListener("click", exportNotesToCSV);
+    }
 }
 
 // Fetch notes from Flask backend API
@@ -252,14 +258,26 @@ function renderFeed() {
                 card.innerHTML = `
                     <div class="card-top">
                         <span class="badge ${categoryClass}">${upd.type}</span>
-                        <div class="select-indicator">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button class="btn-card-copy" title="Copy update to clipboard" aria-label="Copy update to clipboard">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                            <div class="select-indicator">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                     <div class="card-content">${upd.content}</div>
                 `;
+
+                // Bind copy button handler (preventing card selection click event bubble)
+                const cardCopyBtn = card.querySelector(".btn-card-copy");
+                cardCopyBtn.addEventListener("click", (e) => copyCardToClipboard(e, upd.content));
                 
                 // Click to select
                 card.addEventListener("click", () => handleCardSelection(uniqueId, entry.date, upd.type, upd.content));
@@ -486,4 +504,86 @@ function applyPreset(presetName) {
     
     localStorage.setItem("theme-preset", presetName);
 }
+
+// Copy Card HTML content as plain text
+async function copyCardToClipboard(event, htmlContent) {
+    event.stopPropagation(); // Stop click bubbling up to select the card
+    const cleanText = cleanHtmlText(htmlContent).trim();
+    const btn = event.currentTarget;
+    
+    try {
+        await navigator.clipboard.writeText(cleanText);
+        
+        // Visual feedback
+        const originalIcon = btn.innerHTML;
+        btn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        `;
+        btn.style.color = "#34d399";
+        
+        setTimeout(() => {
+            btn.innerHTML = originalIcon;
+            btn.style.color = "";
+        }, 1500);
+    } catch (err) {
+        console.error("Card content copy failed", err);
+        alert("Failed to copy card content.");
+    }
+}
+
+// Export currently filtered release notes to CSV file
+function exportNotesToCSV() {
+    const searchQuery = searchInput.value.toLowerCase().trim();
+    const activeFilters = getActiveFilters();
+    
+    const rows = [["Date", "Type", "Content"]];
+    
+    releaseNotes.forEach(entry => {
+        entry.updates.forEach(upd => {
+            const matchesType = activeFilters.includes(upd.type) || (upd.type === "General" && activeFilters.includes("General"));
+            if (!matchesType) return;
+            
+            const cleanContent = cleanHtmlText(upd.content);
+            
+            if (searchQuery) {
+                const typeMatch = upd.type.toLowerCase().includes(searchQuery);
+                const dateMatch = entry.date.toLowerCase().includes(searchQuery);
+                const contentMatch = cleanContent.toLowerCase().includes(searchQuery);
+                if (!typeMatch && !dateMatch && !contentMatch) return;
+            }
+            
+            // Format dates cleanly, add to rows
+            rows.push([entry.date, upd.type, cleanContent.trim()]);
+        });
+    });
+    
+    if (rows.length <= 1) {
+        alert("No release notes matching active search/filters to export.");
+        return;
+    }
+    
+    // Build CSV string with correct quoting and escaping
+    const csvString = rows.map(r => 
+        r.map(val => `"${val.replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+    
+    // Start download
+    try {
+        const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "bigquery_release_notes.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (err) {
+        console.error("Failed to generate CSV export", err);
+        alert("Failed to generate CSV export file.");
+    }
+}
+
 
