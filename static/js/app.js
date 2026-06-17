@@ -25,6 +25,12 @@ const xPreviewText = document.getElementById("x-preview-text-content");
 const copyBtn = document.getElementById("copy-btn");
 const tweetBtn = document.getElementById("tweet-btn");
 
+// Theme and Customizer Elements
+const themeToggleBtn = document.getElementById("theme-toggle-btn");
+const themePresetsContainer = document.getElementById("theme-presets");
+const moonIcon = themeToggleBtn.querySelector(".moon-icon");
+const sunIcon = themeToggleBtn.querySelector(".sun-icon");
+
 // Statistics Elements
 const statTotalNotes = document.getElementById("stat-total-notes");
 const statLastUpdated = document.getElementById("stat-last-updated");
@@ -38,6 +44,7 @@ const countBadges = {
 
 // Initialize App
 document.addEventListener("DOMContentLoaded", () => {
+    initializeTheme();
     fetchReleaseNotes(false);
     setupEventListeners();
 });
@@ -58,6 +65,17 @@ function setupEventListeners() {
 
     // Tweet / X Post Web Intent Action
     tweetBtn.addEventListener("click", openTwitterShare);
+
+    // Theme Customizer Actions
+    themeToggleBtn.addEventListener("click", toggleTheme);
+    
+    const presetButtons = themePresetsContainer.querySelectorAll(".theme-preset-btn");
+    presetButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const presetName = e.currentTarget.getAttribute("data-preset");
+            applyPreset(presetName);
+        });
+    });
 }
 
 // Fetch notes from Flask backend API
@@ -378,3 +396,94 @@ function openTwitterShare() {
     const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intentUrl, "_blank", "noopener,noreferrer");
 }
+
+// Preset Colors Mapping
+const colorPresets = {
+    blue: {
+        "--primary": "#1a73e8",
+        "--primary-hover": "#3b82f6",
+        "--primary-glow": "rgba(26, 115, 232, 0.25)",
+        "--accent": "#00f5ff",
+        "--accent-glow": "rgba(0, 245, 255, 0.2)"
+    },
+    purple: {
+        "--primary": "#a855f7",
+        "--primary-hover": "#c084fc",
+        "--primary-glow": "rgba(168, 85, 247, 0.25)",
+        "--accent": "#f43f5e",
+        "--accent-glow": "rgba(244, 63, 94, 0.2)"
+    },
+    green: {
+        "--primary": "#10b981",
+        "--primary-hover": "#34d399",
+        "--primary-glow": "rgba(16, 185, 129, 0.25)",
+        "--accent": "#00f5ff",
+        "--accent-glow": "rgba(0, 245, 255, 0.2)"
+    },
+    orange: {
+        "--primary": "#f97316",
+        "--primary-hover": "#fb923c",
+        "--primary-glow": "rgba(249, 115, 22, 0.25)",
+        "--accent": "#fbbf24",
+        "--accent-glow": "rgba(251, 191, 36, 0.2)"
+    }
+};
+
+// Initialize Theme from Local Storage
+function initializeTheme() {
+    // 1. Theme mode (dark/light)
+    const savedTheme = localStorage.getItem("theme-mode") || "dark";
+    if (savedTheme === "light") {
+        document.body.classList.add("light-theme");
+        moonIcon.style.display = "none";
+        sunIcon.style.display = "block";
+    } else {
+        document.body.classList.remove("light-theme");
+        moonIcon.style.display = "block";
+        sunIcon.style.display = "none";
+    }
+
+    // 2. Color Preset
+    const savedPreset = localStorage.getItem("theme-preset") || "blue";
+    applyPreset(savedPreset);
+}
+
+// Toggle Theme (Dark / Light)
+function toggleTheme() {
+    const isLight = document.body.classList.toggle("light-theme");
+    if (isLight) {
+        localStorage.setItem("theme-mode", "light");
+        moonIcon.style.display = "none";
+        sunIcon.style.display = "block";
+    } else {
+        localStorage.setItem("theme-mode", "dark");
+        moonIcon.style.display = "block";
+        sunIcon.style.display = "none";
+    }
+}
+
+// Apply Color Preset Accent Variables
+function applyPreset(presetName) {
+    if (!colorPresets[presetName]) return;
+    
+    const preset = colorPresets[presetName];
+    
+    // Set custom CSS variables on root
+    const root = document.documentElement;
+    Object.keys(preset).forEach(variable => {
+        root.style.setProperty(variable, preset[variable]);
+    });
+    
+    // Update active preset button styling
+    const buttons = themePresetsContainer.querySelectorAll(".theme-preset-btn");
+    buttons.forEach(btn => {
+        if (btn.getAttribute("data-preset") === presetName) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+    
+    localStorage.setItem("theme-preset", presetName);
+}
+

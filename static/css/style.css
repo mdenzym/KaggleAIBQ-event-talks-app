@@ -44,6 +44,30 @@
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+body.light-theme {
+    --bg-dark: #f8fafc;
+    --bg-panel: rgba(255, 255, 255, 0.75);
+    --bg-card: rgba(241, 245, 249, 0.7);
+    --bg-card-hover: rgba(226, 232, 240, 0.85);
+    --bg-card-active: rgba(26, 115, 232, 0.05);
+    
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.15);
+    --border-active: #1a73e8;
+    --border-active-glow: rgba(26, 115, 232, 0.15);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    
+    --badge-general-bg: rgba(100, 116, 139, 0.1);
+    --badge-general-text: #475569;
+    
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(26, 115, 232, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 245, 255, 0.02) 0%, transparent 40%);
+}
+
 /* Reset and Global Styles */
 * {
     margin: 0;
@@ -922,3 +946,106 @@ main {
         padding: 0 1rem;
     }
 }
+
+/* Theme Toggle Button Styles */
+.btn-theme-toggle {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-speed) var(--ease-out);
+}
+
+.btn-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--text-secondary);
+    transform: translateY(-1px);
+}
+
+body.light-theme .btn-theme-toggle {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+body.light-theme .btn-theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* Theme Presets Styles */
+.theme-preset-container {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    padding: 0.4rem 0;
+}
+
+.theme-preset-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--ease-out);
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.theme-preset-btn:hover {
+    transform: scale(1.15);
+}
+
+.theme-preset-btn.active {
+    border-color: var(--text-primary);
+    transform: scale(1.1);
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+
+.theme-preset-btn[data-preset="blue"] { background: #1a73e8; }
+.theme-preset-btn[data-preset="purple"] { background: #a855f7; }
+.theme-preset-btn[data-preset="green"] { background: #10b981; }
+.theme-preset-btn[data-preset="orange"] { background: #f97316; }
+
+/* Overrides for X/Twitter preview in Light Mode */
+body.light-theme .x-preview-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .x-name {
+    color: #0f1419;
+}
+
+body.light-theme .x-preview-text {
+    color: #0f1419;
+}
+
+body.light-theme .x-link-card {
+    border-color: #cfd9de;
+}
+
+body.light-theme .x-link-image {
+    background: linear-gradient(135deg, #f7f9f9 0%, #eff3f4 100%);
+    border-bottom-color: #cfd9de;
+}
+
+body.light-theme .x-link-details {
+    background: #ffffff;
+}
+
+body.light-theme .x-link-title {
+    color: #0f1419;
+}
+
+body.light-theme .composer-placeholder svg {
+    color: rgba(0, 0, 0, 0.04);
+}
+
+body.light-theme .empty-state svg {
+    color: rgba(0, 0, 0, 0.04);
+}
+

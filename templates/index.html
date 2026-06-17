@@ -25,6 +25,26 @@
                 <span class="status-dot"></span>
                 <span id="status-text">Connecting...</span>
             </div>
+            
+            <button class="btn-theme-toggle" id="theme-toggle-btn" aria-label="Toggle light/dark theme">
+                <!-- Moon Icon (Dark Mode by default) -->
+                <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <!-- Sun Icon (hidden by default) -->
+                <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+
             <button class="btn-refresh" id="refresh-btn" aria-label="Refresh release notes">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M23 4v6h-6M1 20v-6h6"></path>
@@ -82,6 +102,16 @@
                             <span>General</span>
                             <span class="badge-count" id="count-general">0</span>
                         </label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h3 class="filter-title">Accent Preset</h3>
+                    <div class="theme-preset-container" id="theme-presets">
+                        <button class="theme-preset-btn active" data-preset="blue" title="Classic Blue" aria-label="Set blue theme"></button>
+                        <button class="theme-preset-btn" data-preset="purple" title="Cyber Purple" aria-label="Set purple theme"></button>
+                        <button class="theme-preset-btn" data-preset="green" title="Emerald Mint" aria-label="Set green theme"></button>
+                        <button class="theme-preset-btn" data-preset="orange" title="Sunset Gold" aria-label="Set orange theme"></button>
                     </div>
                 </div>
 
